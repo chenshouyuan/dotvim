@@ -43,3 +43,6 @@
 [submodule "bundle/peaksea"]
 	path = bundle/peaksea
 	url = git://github.com/vim-scripts/peaksea.git
+[submodule "bundle/haskell.vim"]
+	path = bundle/haskell.vim
+	url = http://github.com/vim-scripts/haskell.vim.git

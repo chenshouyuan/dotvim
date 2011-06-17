@@ -1,13 +1,47 @@
 call pathogen#runtime_append_all_bundles()
 call pathogen#helptags()
 
+" perforce commands
+command! -nargs=* -complete=file PEdit :!g4 edit %
+command! -nargs=* -complete=file PRevert :!g4 revert %
+command! -nargs=* -complete=file PDiff :!g4 diff %
+
+function! s:CheckOutFile()
+ if filereadable(expand("%")) && ! filewritable(expand("%"))
+   let s:pos = getpos('.')
+   let option = confirm("Readonly file, do you want to checkout from p4?"
+         \, "&Yes\n&No", 1, "Question")
+   if option == 1
+     PEdit
+   endif
+   edit!
+   call cursor(s:pos[1:3])
+ endif
+endfunction
+au FileChangedRO * nested :call <SID>CheckOutFile()
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => General
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Sets how many lines of history VIM has to remember
 set history=300
+"match DiffAdd '\%>80v.*'
+augroup textwidth_highlight
+  au!
+"  autocmd BufRead * highlight OverLength ctermbg=red ctermfg=white guibg=red guifg=white
+"  autocmd BufRead * match OverLength /\%81v.*/
+augroup END
 
-au GUIEnter * simalt ~x "maximum the initial window
+au FileType html,tex map <buffer> j gj
+au FileType html,tex map <buffer> k gk
+
+au FileType html,tex map <buffer> <Down> gj
+au FileType html,tex map <buffer> <Up> gk
+
+au FileType html,tex map <buffer> <Home> g^
+au FileType html,tex map <buffer> <End> g$
+
+"au GUIEnter * simalt ~x "maximum the initial window
 
 " Enable filetype plugin
 filetype plugin on
@@ -31,18 +65,8 @@ map <leader>e :e! ../_vimrc<cr>
 autocmd! bufwritepost vimrc source ../_vimrc<cr>
 
 fun! MySys()
-   return "windows"
+   return "linux"
 endfun
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Windows-Like ShortCuts
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-source $VIMRUNTIME/mswin.vim
-behave mswin
-
-:nmap <C-t> :tabnew <CR>     
-:nmap <C-w> :tabclose<cr>
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -87,27 +111,26 @@ set t_vb=
 syntax enable "Enable syntax hl
 
 " Set font according to system
-" if MySys() == "mac"
-"  set gfn=Bitstream\ Vera\ Sans\ Mono:h13
-"  set shell=/bin/bash
-" elseif MySys() == "windows"
-"  set gfn=Bitstream\ Vera\ Sans\ Mono:h10
+ if MySys() == "mac"
+   set gfn=Bitstream\ Vera\ Sans\ Mono:h13
+   set shell=/bin/bash
+  elseif MySys() == "windows"
+   set gfn=Bitstream\ Vera\ Sans\ Mono:h10
    set gfn=Inconsolata:h14:cANSI
-" elseif MySys() == "linux"
-"  set gfn=Monospace\ 10
-"  set shell=/bin/bash
-"endif
+ elseif MySys() == "linux"
+  set gfn=Inconsolata\ 14
+  set shell=/bin/bash
+endif
 
 if has("gui_running")
   set guioptions-=T
-"  set background=dark
+  set background=dark
   set t_Co=256
   colorscheme peaksea 
   set nu
 else
   colorscheme zellner
   set background=dark
-  
   set nonu
 endif
 
@@ -544,3 +567,16 @@ map <leader>q :e ~/buffer<cr>
 " endfunction
 " nmap <leader>pv :YardPreview<cr>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Windows-Like ShortCuts
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+source $VIMRUNTIME/mswin.vim
+behave mswin
+
+:nmap <C-t> :tabnew <CR>     
+":nmap <C-w> :tabclose<cr>
+
+
+
