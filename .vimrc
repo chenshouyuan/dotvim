@@ -129,8 +129,11 @@ if has("gui_running")
   colorscheme peaksea 
   set nu
 else
-  colorscheme zellner
+  set t_Co=256  
   set background=dark
+  colorscheme peaksea
+  "  colorscheme zellner
+  " set background=dark
   set nonu
 endif
 
